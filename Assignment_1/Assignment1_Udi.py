@@ -13,7 +13,7 @@ histogrambin = 20  # histogram bins when calculating the concentration profile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-
+from tqdm import tqdm
 ####################Initialize#####################
 particles = []
 
@@ -24,27 +24,28 @@ for n in range(N):
 
 
 ######################Functions###############################
-def move(x, y):
+def move_with_gravity(x, y, g_effect):
     header = np.random.rand() * 2 * np.pi
     newx = x + 1 / np.sqrt(R) * np.cos(header)
-    newy = y + 1 / np.sqrt(R) * np.sin(header)
-    while newx < 0 or newx >= boxSizeX or newy < 0 or newy >= boxSizeY:  # keeps particles inside the box by resetting the header direction to keep it within the box
+    newy = y + 1 / np.sqrt(R) * np.sin(header) - g_effect  # Adding gravity effect
+    while newx < 0 or newx >= boxSizeX or newy < 0 or newy >= boxSizeY:
         header = np.random.rand() * 2 * np.pi
         newx = x + 1 / np.sqrt(R) * np.cos(header)
-        newy = y + 1 / np.sqrt(R) * np.sin(header)
-    # reset header for the next time step
+        newy = y + 1 / np.sqrt(R) * np.sin(header) - g_effect
     return ([newx, newy])
+
+g_effect = 1  # Adjust based on gravity effect; assume c2 = 1 as per the question
 
 
 #######################progressing the simulation###########################
 
 positionDataX = []  # saves the group x data for each time step
 positionDataY = []  # saves the group y data for each time step
-for t in range(timeStep):
+for t in tqdm(range(timeStep)):
     x = []
     y = []
     for turtle in range(N):
-        particles[turtle] = move(particles[turtle][0], particles[turtle][1])
+        particles[turtle] = move_with_gravity(particles[turtle][0], particles[turtle][1], g_effect)
         x.append(particles[turtle][0])
         y.append(particles[turtle][1])
     positionDataX.append(x)
