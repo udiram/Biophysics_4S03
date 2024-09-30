@@ -1,12 +1,12 @@
 ######################### A Brownian Motion simulation developed by Carmen Lee for PHYS 4S03 tutorial #1 python v3.6 ##########################
 
 ########################## Variables ################
-N = 200  # Reduced number of particles
+N = 2000  # Reduced number of particles
 boxSizeX = 20  # Width
 boxSizeY = 40  # Height
 R = 0.5  # Particle size
-timeStep = 200  # Reduced length of the simulation
-histogrambin = 20  # Histogram bins when calculating the concentration profile
+timeStep = 100  # Reduced length of the simulation
+histogrambin = 50  # Histogram bins when calculating the concentration profile
 
 ################# Modules ###########################
 import numpy as np
@@ -38,7 +38,7 @@ positionDataY_centrifuge = []  # Saves the group y data for each time step (cent
 
 for t in tqdm(range(timeStep)):
     # Update positions for normal gravity particles
-    move_particles(particles_normal, g_effect=1)
+    move_particles(particles_normal, g_effect=0.09)
     positionDataX_normal.append(particles_normal[:, 0].copy())
     positionDataY_normal.append(particles_normal[:, 1].copy())
 
