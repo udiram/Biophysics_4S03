@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# World boundary
 world = 20
 
-# Initialize a chain of residues in a 2D space
 def initialize_chain(N, starting_position):
     positionsX = [starting_position[0]]
     positionsY = [starting_position[1]]
@@ -16,7 +14,6 @@ def initialize_chain(N, starting_position):
         positionsY.append(y)
     return positionsX, positionsY
 
-# Determine residue location
 def determine_location(x, y, thickness, radius):
     """
     Determines whether a point (x, y) is in the endosome, cytosol, membrane, or pore.
@@ -34,7 +31,6 @@ def determine_location(x, y, thickness, radius):
     else:
         return "cytosol"
 
-# Move a single residue with energy consideration
 def move_with_energy(i, positionsX, positionsY, charges, thickness, radius, kT=1):
     """
     Attempts to move a residue with energy considerations for charged residues in the pore.
@@ -44,16 +40,13 @@ def move_with_energy(i, positionsX, positionsY, charges, thickness, radius, kT=1
     new_positionsX = positionsX.copy()
     new_positionsY = positionsY.copy()
 
-    # Propose a new position
     angle = np.random.uniform(0, 2 * np.pi)
     x_new = x_old + np.cos(angle)
     y_new = y_old + np.sin(angle)
 
-    # Enforce boundary constraints
     if not (-world <= x_new <= world and -world <= y_new <= world):
         return positionsX, positionsY  # Reject move outside the world
 
-    # Determine energy change
     old_location = determine_location(x_old, y_old, thickness, radius)
     new_location = determine_location(x_new, y_new, thickness, radius)
 
@@ -67,16 +60,13 @@ def move_with_energy(i, positionsX, positionsY, charges, thickness, radius, kT=1
     else:  # Neutral residue
         delta_E = 0
 
-    # Probabilistic acceptance
     if delta_E > 0 and np.random.rand() >= np.exp(-delta_E / kT):
         return positionsX, positionsY  # Reject the move based on energy
 
-    # Accept the move
     new_positionsX[i] = x_new
     new_positionsY[i] = y_new
     return new_positionsX, new_positionsY
 
-# Simulate and track data with energy considerations
 def simulate_with_energy(N, ticks, starting_position, thickness, radius, pH, pKa, kT=1):
     """
     Simulates Brownian motion with energy considerations for charged residues in the pore.
@@ -85,18 +75,15 @@ def simulate_with_energy(N, ticks, starting_position, thickness, radius, pH, pKa
     positionsX_array = [positionsX]
     positionsY_array = [positionsY]
 
-    # Initialize charges based on pH and pKa
     probability = 1 / (1 + 10 ** (pKa - pH))
     charges = (np.random.rand(N) < probability).astype(int) * -1  # Charges: -1 or 0
 
-    # Simulate motion
     for _ in range(ticks):
         for i in range(N):
             positionsX, positionsY = move_with_energy(i, positionsX, positionsY, charges, thickness, radius, kT)
         positionsX_array.append(positionsX)
         positionsY_array.append(positionsY)
 
-    # Visualize the trajectory of the first residue
     residue_index = 0
     trajectory = [positionsY_array[t][residue_index] for t in range(len(positionsY_array))]
 
@@ -112,11 +99,9 @@ def simulate_with_energy(N, ticks, starting_position, thickness, radius, pH, pKa
     plt.savefig('3e.png')
     plt.show()
 
-    # Print final position and energy considerations
     final_location = determine_location(positionsX[residue_index], positionsY[residue_index], thickness, radius)
     print(f"Final Compartment: {final_location}")
 
-# Parameters
 N = 20  # Number of residues
 ticks = 1000  # Number of time steps
 starting_position = [0, 10]  # Start higher in the box
@@ -126,5 +111,4 @@ pH = 7  # World pH
 pKa = 7  # Residue pKa
 kT = 1  # Thermal energy factor
 
-# Run the simulation
 simulate_with_energy(N, ticks, starting_position, thickness, radius, pH, pKa, kT)

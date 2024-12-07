@@ -1,11 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-# World boundary
 world = 20
 
-
-# Initialize a chain of residues in a 2D space
 def initialize_chain(N, starting_position):
     positionsX = [starting_position[0]]
     positionsY = [starting_position[1]]
@@ -16,7 +13,6 @@ def initialize_chain(N, starting_position):
         positionsX.append(x)
         positionsY.append(y)
     return positionsX, positionsY
-
 
 # Move a single residue
 def move(i, positionsX, positionsY):
@@ -41,15 +37,12 @@ def move(i, positionsX, positionsY):
         x_new = x_mid + np.cos(angle)
         y_new = y_mid + np.sin(angle)
 
-    # Enforce boundary constraints
     if -world <= x_new <= world and -world <= y_new <= world:
         new_positionsX[i] = x_new
         new_positionsY[i] = y_new
 
     return new_positionsX, new_positionsY
 
-
-# Function to determine residue location
 def determine_location(x, y, thickness, radius):
     """
     Determines whether a point (x, y) is in the endosome, cytosol, membrane, or pore.
@@ -66,7 +59,6 @@ def determine_location(x, y, thickness, radius):
         return "endosome"
     else:
         return "cytosol"
-
 
 # Track compartment changes
 def track_compartment_changes(positionsX, positionsY, ticks, thickness, radius):
@@ -88,8 +80,6 @@ def track_compartment_changes(positionsX, positionsY, ticks, thickness, radius):
 
     return compartment_changes, y_positions, compartments
 
-
-# Simulate and track data
 def simulate_and_track(N, ticks, starting_position, thickness, radius):
     """
     Simulates Brownian motion and tracks residue movement through compartments.
@@ -105,12 +95,10 @@ def simulate_and_track(N, ticks, starting_position, thickness, radius):
         positionsX_array.append(positionsX)
         positionsY_array.append(positionsY)
 
-    # Track compartment changes
     compartment_changes, trajectory, compartments = track_compartment_changes(
         positionsX_array, positionsY_array, ticks, thickness, radius
     )
 
-    # Plot the trajectory
     plt.figure(figsize=(10, 6))
     plt.plot(range(ticks), trajectory, label="Y-Position of Tracked Residue")
     plt.axhline(thickness / 2, color='gray', linestyle='--', label="Membrane Top")
@@ -123,10 +111,8 @@ def simulate_and_track(N, ticks, starting_position, thickness, radius):
     plt.savefig('3d.png')
     plt.show()
 
-    # Print results
     print(f"Number of Compartment Changes: {compartment_changes}")
     print(f"Final Compartment: {compartments[-1]}")
-
 
 # Parameters
 N = 20  # Number of residues
@@ -135,5 +121,4 @@ starting_position = [0, 10]  # Start higher in the box
 thickness = 2  # Membrane thickness
 radius = 3  # Pore radius
 
-# Run the simulation and analysis
 simulate_and_track(N, ticks, starting_position, thickness, radius)
